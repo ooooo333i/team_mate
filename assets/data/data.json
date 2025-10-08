@@ -1,0 +1,32 @@
+[
+  {
+    "studentId": "20230001",
+    "name": "김민수",
+    "username": "minsu_kim",
+    "major": "컴퓨터공학과",
+    "desiredRole": "프론트엔드 개발자",
+    "techStack": ["Flutter", "Dart", "Firebase", "Figma"],
+    "additionalInfo": "UI/UX 디자인에도 관심이 많아요.",
+    "isPublic": true
+  },
+  {
+    "studentId": "20230002",
+    "name": "이수현",
+    "username": "soohyun_lee",
+    "major": "소프트웨어학과",
+    "desiredRole": "백엔드 개발자",
+    "techStack": ["Spring Boot", "Java", "MySQL", "AWS"],
+    "additionalInfo": "API 설계와 서버 인프라에 관심 있습니다.",
+    "isPublic": false
+  },
+  {
+    "studentId": "20230003",
+    "name": "박정우",
+    "username": "jungwoo_p",
+    "major": "정보보호학과",
+    "desiredRole": "보안 엔지니어",
+    "techStack": ["Python", "Linux", "Network", "C"],
+    "additionalInfo": "모의 해킹 관련 프로젝트 진행 중.",
+    "isPublic": true
+  }
+]

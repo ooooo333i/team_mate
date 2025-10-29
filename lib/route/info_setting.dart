@@ -10,6 +10,10 @@ class InfoSetting extends StatefulWidget {
 class _InfoSettingState extends State<InfoSetting> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Infomation Setting"),
+      ),
+    );
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:team_mate/route/loginpage.dart';
+//import 'package:team_mate/route/loginpage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomePage(),
-        '/loginpage': (context) => const LoginPage(),
+        //'/loginpage': (context) => const LoginPage(),
       },
     );
   }

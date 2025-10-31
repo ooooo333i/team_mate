@@ -10,7 +10,7 @@ class AppTheme {
     scaffoldBackgroundColor: Colors.grey[100],
 
     appBarTheme: AppBarTheme(
-      backgroundColor: Color.fromARGB(255, 158, 254, 245),
+      backgroundColor: Color.fromARGB(255, 44, 126, 118),
       foregroundColor: Colors.white,
       elevation: 0,
     ),
@@ -19,7 +19,7 @@ class AppTheme {
 
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: lightColorScheme.primary,
+        backgroundColor: Color.fromARGB(255, 74, 177, 166),
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

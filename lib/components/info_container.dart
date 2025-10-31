@@ -57,7 +57,7 @@ class InfoContainer extends StatelessWidget {
                 children: techStack
                     .map((tech) => Chip(
                           label: Text(tech),
-                          backgroundColor: Colors.blue[50],
+                          backgroundColor: const Color.fromARGB(255, 249, 255, 250),
                         ))
                     .toList(),
               ),

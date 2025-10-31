@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:team_mate/components/listview.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,7 +18,7 @@ class _HomeState extends State<Home> {
           onPressed: () {
             Navigator.pushNamed(context, '/loginpage');
           },
-          icon: const Icon(Icons.play_arrow),
+          icon: const Icon(Icons.account_box),
         ),
         actions: [
           IconButton(
@@ -28,6 +29,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
+      body: InfoListView(),
     );
   }
 }

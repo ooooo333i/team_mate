@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -22,12 +23,17 @@ class _LoginPageState extends State<LoginPage> {
     await Future.delayed(const Duration(seconds: 1));
 
     if (studentId.isNotEmpty && password.isNotEmpty) {
+      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
+        
         const SnackBar(content: Text('로그인 성공 (임시)')),
+        
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
+        
         const SnackBar(content: Text('학번과 비밀번호를 입력하세요')),
+        
       );
     }
 

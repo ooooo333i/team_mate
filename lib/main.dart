@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:team_mate/route/home.dart';
-import 'package:team_mate/route/info_page.dart';
-import 'package:team_mate/route/info_setting.dart';
-import 'package:team_mate/route/login_page.dart';
-
+import 'package:team_mate/routes/home.dart';
+import 'package:team_mate/routes/info_page.dart';
+import 'package:team_mate/routes/info_setting.dart';
+import 'package:team_mate/routes/login_page.dart';
+import 'theme/app_theme.dart';
 void main(){
   runApp(const MyApp());
 }
@@ -26,6 +26,9 @@ class _MyAppState extends State<MyApp>{
         '/infosetting': (context) => const InfoSetting(),
         '/infopage' : (context) => InfoPage(),
       },
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
     );
   }
 }

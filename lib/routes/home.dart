@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:team_mate/components/listview.dart';
-import 'package:team_mate/components/filter_block.dart';
-import 'package:team_mate/components/user_drawer.dart';
+import 'package:team_mate/components/profiles_page.dart';
+import 'package:team_mate/components/liked_listview.dart';
+import 'package:team_mate/components/bottom_navi_bar.dart';
+
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -10,16 +12,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int currentIndex = 0;
+
+  final pages = [
+    ProfilesPage(),     // 필터 + 리스트
+    LikedListview(),    // 좋아요 목록 화면
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
-      key: _scaffoldKey,   // Scaffold에 key 연결
-
-      endDrawer: const UserDrawer(),  // 오른쪽 Drawer UI
+      key: scaffoldKey, // 🔑 드로어 열기 위해 필요
       appBar: AppBar(
-        title: Text('Team Mate'),
+        title: const Text('Team Mate'),
         leading: IconButton(
           onPressed: () {
             Navigator.pushNamed(context, '/loginpage');
@@ -29,25 +35,23 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             onPressed: () {
-              _scaffoldKey.currentState!.openEndDrawer();  
+              scaffoldKey.currentState?.openEndDrawer();
             },
             icon: const Icon(Icons.settings),
           ),
         ],
-      
       ),
-      
-      body: Column(
-        children: [
-          FilterBlock(
-            onFilterChanged: (filters) {
-              // 필터가 변경될 때 처리할 로직
-              print("Selected Major: ${filters['major']}");
-              print("Search Query: ${filters['search']}");
-            },
-          ),
-          Expanded(child: InfoListView()),
-        ],
+      body: IndexedStack(
+        index: currentIndex,
+        children: pages,
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: currentIndex,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
       ),
     );
   }

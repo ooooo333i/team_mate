@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:team_mate/components/info_container.dart';
 
-class InfoListView extends StatefulWidget {
-  const InfoListView({super.key});
+class LikedListview extends StatefulWidget {
+  const LikedListview({super.key});
 
   @override
-  State<InfoListView> createState() => _InfoListViewState();
+  State<LikedListview> createState() => _LikedListviewState();
 }
 
-class _InfoListViewState extends State<InfoListView> {
+class _LikedListviewState extends State<LikedListview> {
   List<dynamic> dataList = [];
   bool isLoading = true;
 
@@ -21,36 +21,36 @@ class _InfoListViewState extends State<InfoListView> {
   }
 
   Future<void> fetchServerData() async {
-  try {
-    final uri = Uri.parse('http://136.114.213.101:8080/api/v1/');
-    final response = await http.get(uri);
+    try {
+      final uri = Uri.parse('http://136.114.213.101:8080/api/v1/');
+      final response = await http.get(uri);
 
-    debugPrint('응답 코드: ${response.statusCode}');
-    debugPrint('응답 본문: ${response.body}');
+      debugPrint('응답 코드: ${response.statusCode}');
+      debugPrint('응답 본문: ${response.body}');
 
-    if (!mounted) return; // 위젯이 트리에서 제거되었으면 종료
+      if (!mounted) return; // 위젯이 트리에서 제거되었으면 종료
 
-    if (response.statusCode == 200 && response.body.isNotEmpty) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      setState(() {
-        dataList = jsonData;
-        isLoading = false;
-      });
-    } else {
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final List<dynamic> jsonData = json.decode(response.body);
+        setState(() {
+          dataList = jsonData;
+          isLoading = false;
+        });
+      } else {
+        setState(() => isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('서버 응답 코드: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ 서버 통신 오류: $e');
+      if (!mounted) return; // 위젯이 사라졌으면 setState 호출 금지
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('서버 응답 코드: ${response.statusCode}')),
+        const SnackBar(content: Text('서버에 연결할 수 없습니다.')),
       );
     }
-  } catch (e) {
-    debugPrint('❌ 서버 통신 오류: $e');
-    if (!mounted) return; // 위젯이 사라졌으면 setState 호출 금지
-    setState(() => isLoading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('서버에 연결할 수 없습니다.')),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {

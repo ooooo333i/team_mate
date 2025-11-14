@@ -18,11 +18,11 @@ class CustomBottomNavBar extends StatelessWidget {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.list),
-          label: '프로필',
+          label: 'List',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.favorite),
-          label: '좋아요',
+          label: 'Lieked',
         ),
       ],
     );

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:team_mate/components/profiles_page.dart';
 import 'package:team_mate/components/liked_listview.dart';
 import 'package:team_mate/components/bottom_navi_bar.dart';
-
-
+import 'package:team_mate/components/user_drawer.dart';
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -37,10 +36,12 @@ class _HomeState extends State<Home> {
             onPressed: () {
               scaffoldKey.currentState?.openEndDrawer();
             },
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.info),
           ),
         ],
+      
       ),
+      endDrawer: const UserDrawer(),
       body: IndexedStack(
         index: currentIndex,
         children: pages,

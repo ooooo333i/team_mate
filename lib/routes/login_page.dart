@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:team_mate/api/auth_api.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,7 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
-  // 🔐 안전하게 JWT 저장
   final storage = const FlutterSecureStorage();
 
   Future<void> handleLogin() async {
@@ -32,48 +31,55 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => isLoading = true);
 
     try {
-      final url = Uri.parse("http://136.114.213.101:8080/api/v1/auth/login");
+      final result = await AuthApi.login(studentId, password);
 
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "id": studentId,
-          "pw": password,
-        }),
-      );
+      final statusCode = result["statusCode"];
+      final responseData = result["body"];
+      final rawBody = result["rawBody"];
 
-      debugPrint("응답 코드: ${response.statusCode}");
-      debugPrint("응답 본문: ${response.body}");
+      // 🔥🔥🔥 로그인 응답 전체 출력 🔥🔥🔥
+      debugPrint("===== 로그인 API 응답 =====");
+      debugPrint("Status Code: $statusCode");
+      debugPrint("Raw Body: $rawBody");
+      debugPrint("Parsed JSON: $responseData");
+      debugPrint("==========================");
 
       if (!mounted) return;
 
-      final responseData = jsonDecode(response.body);
-
-      // 회원이 없는 경우
+      // ❗ NOT_FOUND 처리
       if (responseData["status"] == "NOT_FOUND") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("회원 정보가 없습니다. 회원 정보를 입력해주세요.")),
-        );
-        Navigator.pushReplacementNamed(context, '/infosetting');
-      }
-      // 로그인 성공, 토큰이 있는 경우
-      else if (response.statusCode == 200 && responseData["token"] != null) {
-        final String token = responseData["token"];
-        await storage.write(key: "jwt", value: token);
+        debugPrint("서버 응답: 사용자 없음 → info_setting 이동");
 
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("로그인 성공!")));
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/infosetting');
+        return;
       }
-      // 기타 실패
-      else {
+
+      // ❗ 로그인 성공(token 존재)
+      if (statusCode == 200 && responseData["token"] != null) {
+        final token = responseData["token"];
+
+        debugPrint("발급된 JWT: $token");
+
+        await storage.write(key: "jwt", value: token);
+        await storage.write(key: "studentId", value: studentId);
+
+        debugPrint("JWT 저장 완료, studentId 저장 완료");
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("로그인 실패: ${responseData["message"] ?? '알 수 없는 오류'}")),
+          const SnackBar(content: Text("로그인 성공!")),
         );
+
+        Navigator.pushReplacementNamed(context, '/home');
+        return;
       }
+
+      // ❗ 기타 로그인 실패
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("로그인 실패: ${responseData["message"] ?? '알 수 없는 오류'}")),
+      );
     } catch (e) {
-      debugPrint("로그인 오류: $e");
+      debugPrint("로그인 오류(EXCEPTION): $e");
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("서버와 통신할 수 없습니다.")),
@@ -87,7 +93,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Login")),
-      backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
@@ -100,42 +105,33 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 40),
 
-              // 학번
               TextField(
                 controller: studentIdController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: '학번',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 20),
 
-              // 비밀번호
               TextField(
                 controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: '비밀번호',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 30),
 
-              // 로그인 버튼
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : handleLogin,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)

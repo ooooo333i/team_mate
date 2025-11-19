@@ -15,6 +15,7 @@ class FilterBlock extends StatefulWidget {
 class _FilterBlockState extends State<FilterBlock> {
   String selectedMajor = "전체";
   List<String> selectedTech = [];
+  bool isExpanded = false; // 확장 상태 여부
 
   final majors = [
     "전체",
@@ -50,7 +51,7 @@ class _FilterBlockState extends State<FilterBlock> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 전공 필터 (작게)
+          // 전공 필터
           Row(
             children: [
               const Text(
@@ -76,45 +77,56 @@ class _FilterBlockState extends State<FilterBlock> {
                   ),
                 ),
               ),
+              IconButton(
+                icon: Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  size: 20,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isExpanded = !isExpanded;
+                  });
+                },
+              ),
             ],
           ),
 
           const SizedBox(height: 6),
 
-          // 기술 스택 (Chips, 작고 컴팩트하게)
-          const Text(
-            "기술 스택:",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-
-          const SizedBox(height: 6),
-
-          Wrap(
-            spacing: 6,
-            runSpacing: -6,
-            children: techList.map((tech) {
-              final bool isSelected = selectedTech.contains(tech);
-              return ChoiceChip(
-                label: Text(
-                  tech,
-                  style: TextStyle(fontSize: 12),
-                ),
-                selected: isSelected,
-                selectedColor: Colors.green.shade200,
-                backgroundColor: Colors.grey.shade200,
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      selectedTech.add(tech);
-                    } else {
-                      selectedTech.remove(tech);
-                    }
-                  });
-                  updateFilter();
-                },
-              );
-            }).toList(),
-          ),
+          // 기술 스택: 확장 상태일 때만 보여줌
+          if (isExpanded) ...[
+            const Text(
+              "기술 스택:",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: -6,
+              children: techList.map((tech) {
+                final bool isSelected = selectedTech.contains(tech);
+                return ChoiceChip(
+                  label: Text(
+                    tech,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  selected: isSelected,
+                  selectedColor: Colors.green.shade200,
+                  backgroundColor: Colors.grey.shade200,
+                  onSelected: (selected) {
+                    setState(() {
+                      if (selected) {
+                        selectedTech.add(tech);
+                      } else {
+                        selectedTech.remove(tech);
+                      }
+                    });
+                    updateFilter();
+                  },
+                );
+              }).toList(),
+            ),
+          ],
         ],
       ),
     );

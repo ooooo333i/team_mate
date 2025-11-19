@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-
-
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,38 +15,78 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
-  void handleLogin() async {
-    setState(() => isLoading = true);
+  // 🔐 안전하게 JWT 저장
+  final storage = const FlutterSecureStorage();
 
+  Future<void> handleLogin() async {
     final studentId = studentIdController.text.trim();
     final password = passwordController.text.trim();
 
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (studentId.isNotEmpty && password.isNotEmpty) {
-      Navigator.pop(context);
+    if (studentId.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        
-        const SnackBar(content: Text('로그인 성공 (임시)')),
-        
+        const SnackBar(content: Text("학번과 비밀번호를 입력하세요")),
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        
-        const SnackBar(content: Text('학번과 비밀번호를 입력하세요')),
-        
-      );
+      return;
     }
 
-    setState(() => isLoading = false);
+    setState(() => isLoading = true);
+
+    try {
+      final url = Uri.parse("http://136.114.213.101:8080/api/v1/auth/login");
+
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "id": studentId,
+          "pw": password,
+        }),
+      );
+
+      debugPrint("응답 코드: ${response.statusCode}");
+      debugPrint("응답 본문: ${response.body}");
+
+      if (!mounted) return;
+
+      final responseData = jsonDecode(response.body);
+
+      // 회원이 없는 경우
+      if (responseData["status"] == "NOT_FOUND") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("회원 정보가 없습니다. 회원 정보를 입력해주세요.")),
+        );
+        Navigator.pushReplacementNamed(context, '/infosetting');
+      }
+      // 로그인 성공, 토큰이 있는 경우
+      else if (response.statusCode == 200 && responseData["token"] != null) {
+        final String token = responseData["token"];
+        await storage.write(key: "jwt", value: token);
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("로그인 성공!")));
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+      // 기타 실패
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("로그인 실패: ${responseData["message"] ?? '알 수 없는 오류'}")),
+        );
+      }
+    } catch (e) {
+      debugPrint("로그인 오류: $e");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("서버와 통신할 수 없습니다.")),
+      );
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("login"),
-      ),
+      appBar: AppBar(title: const Text("Login")),
       backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
@@ -59,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 40),
 
+              // 학번
               TextField(
                 controller: studentIdController,
                 keyboardType: TextInputType.number,
@@ -69,9 +111,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
 
+              // 비밀번호
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -82,9 +124,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 30),
 
+              // 로그인 버튼
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -100,10 +142,6 @@ class _LoginPageState extends State<LoginPage> {
                       : const Text('로그인', style: TextStyle(fontSize: 18)),
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              
             ],
           ),
         ),

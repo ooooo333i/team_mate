@@ -22,7 +22,7 @@ class _LikedListviewState extends State<LikedListview> {
 
   Future<void> fetchServerData() async {
     try {
-      final uri = Uri.parse('http://136.114.213.101:8080/api/v1/');
+      final uri = Uri.parse('http://136.114.213.101:8080/');
       final response = await http.get(uri);
 
       debugPrint('응답 코드: ${response.statusCode}');

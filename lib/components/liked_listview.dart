@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:team_mate/components/info_container.dart';
+import 'package:team_mate/services/token_storage.dart';
 
 class LikedListview extends StatefulWidget {
   const LikedListview({super.key});
@@ -22,20 +23,52 @@ class _LikedListviewState extends State<LikedListview> {
 
   Future<void> fetchServerData() async {
     try {
-      final uri = Uri.parse('http://136.114.213.101:8080/');
-      final response = await http.get(uri);
+      final accessToken = await TokenStorage.getAccessToken();
+      final temporaryToken = await TokenStorage.getTemporaryToken();
+      final tokenToUse = accessToken ?? temporaryToken;
+
+      if (tokenToUse == null) {
+        debugPrint('토큰 없음 → 로그인 필요');
+        setState(() => isLoading = false);
+        Navigator.pushReplacementNamed(context, '/loginpage');
+        return;
+      }
+
+      final uri = Uri.parse('http://136.114.213.101:8080/api/v1/member');
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $tokenToUse',
+          'Content-Type': 'application/json',
+        },
+      );
 
       debugPrint('응답 코드: ${response.statusCode}');
       debugPrint('응답 본문: ${response.body}');
 
-      if (!mounted) return; // 위젯이 트리에서 제거되었으면 종료
+      if (!mounted) return;
 
       if (response.statusCode == 200 && response.body.isNotEmpty) {
-        final List<dynamic> jsonData = json.decode(response.body);
+        final decoded = json.decode(response.body);
+
+        // 서버가 Map을 보내면 List로 감싸서 처리
+        List<dynamic> jsonData;
+        if (decoded is List) {
+          jsonData = decoded;
+        } else if (decoded is Map) {
+          jsonData = [decoded];
+        } else {
+          jsonData = [];
+        }
+
         setState(() {
           dataList = jsonData;
           isLoading = false;
         });
+      } else if (response.statusCode == 401) {
+        debugPrint("401 Unauthorized → 로그인 필요");
+        setState(() => isLoading = false);
+        Navigator.pushReplacementNamed(context, '/loginpage');
       } else {
         setState(() => isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -43,8 +76,8 @@ class _LikedListviewState extends State<LikedListview> {
         );
       }
     } catch (e) {
-      debugPrint('❌ 서버 통신 오류: $e');
-      if (!mounted) return; // 위젯이 사라졌으면 setState 호출 금지
+      debugPrint('서버 통신 오류: $e');
+      if (!mounted) return;
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('서버에 연결할 수 없습니다.')),

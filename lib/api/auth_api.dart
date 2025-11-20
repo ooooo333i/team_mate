@@ -10,7 +10,7 @@ class AuthApi {
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"id": id, "pw": pw}),
+      body: jsonEncode({"studentId": id, "password": pw}),
     );
 
     // 헤더에서 Authorization 읽기

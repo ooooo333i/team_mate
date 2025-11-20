@@ -6,6 +6,7 @@ class TokenStorage {
   static const _refreshTokenKey = 'refresh_token';
   static final _storage = FlutterSecureStorage();
 
+  
   // 임시 토큰
   static Future<void> setTemporaryToken(String token) =>
       _storage.write(key: _temporaryTokenKey, value: token);

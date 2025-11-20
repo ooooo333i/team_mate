@@ -49,13 +49,23 @@ class _InfoListViewState extends State<InfoListView> {
       if (!mounted) return;
 
       if (response.statusCode == 200 && response.body.isNotEmpty) {
-        final List<dynamic> jsonData = json.decode(response.body);
+        final decoded = json.decode(response.body);
+
+        // 서버가 Map을 보내면 List로 감싸서 처리
+        List<dynamic> jsonData;
+        if (decoded is List) {
+          jsonData = decoded;
+        } else if (decoded is Map) {
+          jsonData = [decoded];
+        } else {
+          jsonData = [];
+        }
+
         setState(() {
           dataList = jsonData;
           isLoading = false;
         });
       } else if (response.statusCode == 401) {
-        // 토큰 만료/잘못됨 → 로그인 페이지로
         debugPrint("401 Unauthorized → 로그인 필요");
         setState(() => isLoading = false);
         Navigator.pushReplacementNamed(context, '/loginpage');

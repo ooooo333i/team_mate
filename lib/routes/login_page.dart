@@ -36,17 +36,19 @@ class _LoginPageState extends State<LoginPage> {
       final statusCode = result["statusCode"];
       final responseData = result["body"];
       final rawBody = result["rawBody"];
+      final token = result["token"]; // 헤더에서 읽음
 
-      // 🔥🔥🔥 로그인 응답 전체 출력 🔥🔥🔥
+      // 🔥🔥 로그인 출력 🔥🔥
       debugPrint("===== 로그인 API 응답 =====");
       debugPrint("Status Code: $statusCode");
       debugPrint("Raw Body: $rawBody");
       debugPrint("Parsed JSON: $responseData");
+      debugPrint("Header Token: $token");
       debugPrint("==========================");
 
       if (!mounted) return;
 
-      // ❗ NOT_FOUND 처리
+      // ❗ 사용자가 회원가입 안 돼 있을 때
       if (responseData["status"] == "NOT_FOUND") {
         debugPrint("서버 응답: 사용자 없음 → info_setting 이동");
 
@@ -54,26 +56,25 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      // ❗ 로그인 성공(token 존재)
-      if (statusCode == 200 && responseData["token"] != null) {
-        final token = responseData["token"];
-
-        debugPrint("발급된 JWT: $token");
+      // ❗ 로그인 성공 — 서버가 Token을 Header로 전달
+      if (statusCode == 200 && token != null) {
+        debugPrint("발급된 토큰: $token");
 
         await storage.write(key: "jwt", value: token);
         await storage.write(key: "studentId", value: studentId);
 
-        debugPrint("JWT 저장 완료, studentId 저장 완료");
+        debugPrint("토큰 저장 완료");
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("로그인 성공!")),
         );
 
-        Navigator.pushReplacementNamed(context, '/home');
+        // 🔥 Home으로 이동
+        Navigator.pushReplacementNamed(context, '/');
         return;
       }
 
-      // ❗ 기타 로그인 실패
+      // ❗ 그 외 실패
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("로그인 실패: ${responseData["message"] ?? '알 수 없는 오류'}")),
       );
@@ -110,7 +111,8 @@ class _LoginPageState extends State<LoginPage> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: '학번',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 20),
@@ -120,7 +122,8 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: '비밀번호',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 30),
@@ -131,7 +134,8 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: isLoading ? null : handleLogin,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)

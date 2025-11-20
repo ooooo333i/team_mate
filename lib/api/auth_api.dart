@@ -13,9 +13,19 @@ class AuthApi {
       body: jsonEncode({"id": id, "pw": pw}),
     );
 
+    // 🔥 헤더에서 Authorization 읽기
+    final authHeader = response.headers["authorization"];
+
+    String? token;
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7); // "Bearer " 제거
+    }
+
     return {
       "statusCode": response.statusCode,
       "body": jsonDecode(response.body),
+      "token": token, // Body가 아니라 Header에서 가져온 토큰
+      "rawBody": response.body,
     };
   }
 }

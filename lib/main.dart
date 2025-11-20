@@ -3,28 +3,31 @@ import 'package:team_mate/routes/home.dart';
 import 'package:team_mate/routes/info_page.dart';
 import 'package:team_mate/routes/info_setting.dart';
 import 'package:team_mate/routes/login_page.dart';
+import 'package:team_mate/services/token_storage.dart';
 import 'theme/app_theme.dart';
-void main(){
-  runApp(const MyApp());
-}
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
+  final token = await TokenStorage.getAccessToken();
+
+  runApp(MyApp(initialRoute: token == null ? '/loginpage' : '/'));
 }
 
-class _MyAppState extends State<MyApp>{
+class MyApp extends StatelessWidget {
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
+
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/',
-      routes:{
+      debugShowCheckedModeBanner: false,
+      initialRoute: initialRoute,
+      routes: {
         '/' : (context) => const Home(),
         '/loginpage': (context) => const LoginPage(),
         '/infosetting': (context) => const InfoSetting(),
-        '/infopage' : (context) => InfoPage(),
+        '/infopage': (context) => const InfoPage(),
       },
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

@@ -12,7 +12,7 @@ class InfoListView extends StatefulWidget {
 }
 
 class _InfoListViewState extends State<InfoListView> {
-  List<dynamic> dataList = [];
+  List<dynamic> profileList = [];
   bool isLoading = true;
 
   @override
@@ -23,86 +23,77 @@ class _InfoListViewState extends State<InfoListView> {
 
   Future<void> fetchServerData() async {
     try {
-      final accessToken = await TokenStorage.getAccessToken();
-      final temporaryToken = await TokenStorage.getTemporaryToken();
-      final tokenToUse = accessToken ?? temporaryToken;
-
-      if (tokenToUse == null) {
-        debugPrint('토큰 없음 → 로그인 필요');
-        setState(() => isLoading = false);
+      final token = await TokenStorage.getAccessToken();
+      if (token == null) {
         Navigator.pushReplacementNamed(context, '/loginpage');
         return;
       }
 
-      final uri = Uri.parse('http://136.114.213.101:8080/api/v1/member');
+      final uri = Uri.parse('http://136.114.213.101:8080/api/v1/profiles');
       final response = await http.get(
         uri,
         headers: {
-          'Authorization': 'Bearer $tokenToUse',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
 
-      debugPrint('응답 코드: ${response.statusCode}');
-      debugPrint('응답 본문: ${response.body}');
+      debugPrint("응답 코드: ${response.statusCode}");
+      debugPrint("응답 본문: ${response.body}");
 
       if (!mounted) return;
 
-      if (response.statusCode == 200 && response.body.isNotEmpty) {
-        final decoded = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
 
-        // 서버가 Map을 보내면 List로 감싸서 처리
-        List<dynamic> jsonData;
-        if (decoded is List) {
-          jsonData = decoded;
-        } else if (decoded is Map) {
-          jsonData = [decoded];
+        // 🔥 핵심: detail → content 까지 들어가서 List 추출
+        final contentList = decoded["detail"]?["content"];
+
+        if (contentList is List) {
+          setState(() {
+            profileList = contentList;
+            isLoading = false;
+          });
         } else {
-          jsonData = [];
+          setState(() => isLoading = false);
         }
 
-        setState(() {
-          dataList = jsonData;
-          isLoading = false;
-        });
-      } else if (response.statusCode == 401) {
-        debugPrint("401 Unauthorized → 로그인 필요");
-        setState(() => isLoading = false);
-        Navigator.pushReplacementNamed(context, '/loginpage');
-      } else {
-        setState(() => isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('서버 응답 코드: ${response.statusCode}')),
-        );
+        return;
       }
+
+      // 토큰 만료
+      if (response.statusCode == 401) {
+        Navigator.pushReplacementNamed(context, '/loginpage');
+        return;
+      }
+
+      setState(() => isLoading = false);
     } catch (e) {
-      debugPrint('서버 통신 오류: $e');
+      debugPrint("서버 통신 오류: $e");
       if (!mounted) return;
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('서버에 연결할 수 없습니다.')),
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (isLoading) return const Center(child: CircularProgressIndicator());
-    if (dataList.isEmpty) return const Center(child: Text('데이터 없음'));
+    if (profileList.isEmpty) return const Center(child: Text('데이터 없음'));
 
     return ListView.builder(
-      itemCount: dataList.length,
+      itemCount: profileList.length,
       itemBuilder: (context, index) {
-        final student = dataList[index];
+        final student = profileList[index];
+
         return InfoContainer(
-          name: student['name'] ?? '이름 없음',
+          name: student['name'] ?? '',
           major: student['major'] ?? '-',
-          task: student['task'] ?? '-',
+          grade: student['grade'] ?? 0,
+          applicationField: student['applicationField'] ?? '-',
           techStack: student['techStack'] ?? [],
-          info: student['info'] ?? '정보 없음',
-          isPublic: student['isPublic'] ?? true,
+          simpleInfo: student['simpleInfo'] ?? '',
           onTap: () {
-            Navigator.pushNamed(context, '/infopage');
+            Navigator.pushNamed(context, '/infopage', arguments: student);
           },
         );
       },

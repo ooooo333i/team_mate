@@ -1,73 +1,76 @@
 import 'package:flutter/material.dart';
 
-
 class InfoContainer extends StatelessWidget {
   final String name;
   final String major;
-  final String task;
+  final int grade;
+  final String applicationField;
   final List<dynamic> techStack;
-  final String info;
-  final bool isPublic;
+  final String simpleInfo;
   final VoidCallback onTap;
 
   const InfoContainer({
     super.key,
     required this.name,
     required this.major,
-    required this.task,
+    required this.grade,
+    required this.applicationField,
     required this.techStack,
-    required this.info,
-    required this.isPublic,
+    required this.simpleInfo,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  if (!isPublic)
-                    const Icon(Icons.lock, color: Colors.grey, size: 20)
-                  else
-                    const Icon(Icons.public, color: Colors.green, size: 20),
-                ],
+              // 이름
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+
               const SizedBox(height: 4),
-              Text('$major • $task', style: const TextStyle(color: Colors.grey)),
-              const SizedBox(height: 8),
+
+              // 전공, 학년, 지원 분야
+              Text(
+                "$major • $grade학년 • $applicationField",
+                style: const TextStyle(color: Colors.grey),
+              ),
+
+              const SizedBox(height: 10),
+
+              // Tech Stack
               Wrap(
-                spacing: 8,
-                runSpacing: -4,
+                spacing: 6,
                 children: techStack
                     .map((tech) => Chip(
                           label: Text(tech),
-                          backgroundColor: const Color.fromARGB(255, 249, 255, 250),
+                          backgroundColor: Colors.grey.shade100,
                         ))
                     .toList(),
               ),
-              const SizedBox(height: 12),
+
+              const SizedBox(height: 10),
+
+              // 간단 소개
               Text(
-                info,
+                simpleInfo,
                 style: const TextStyle(fontSize: 14),
               ),
-              const SizedBox(height: 8),
-              
             ],
           ),
         ),

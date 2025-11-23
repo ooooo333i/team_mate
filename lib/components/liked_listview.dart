@@ -79,9 +79,9 @@ class _LikedListviewState extends State<LikedListview> {
       debugPrint('서버 통신 오류: $e');
       if (!mounted) return;
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('서버에 연결할 수 없습니다.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('서버에 연결할 수 없습니다.')));
     }
   }
 
@@ -92,9 +92,7 @@ class _LikedListviewState extends State<LikedListview> {
     }
 
     if (dataList.isEmpty) {
-      return const Center(
-        child: Text('서버에서 데이터를 불러올 수 없습니다.'),
-      );
+      return const Center(child: Text('서버에서 데이터를 불러올 수 없습니다.'));
     }
 
     return ListView.builder(
@@ -102,17 +100,14 @@ class _LikedListviewState extends State<LikedListview> {
       itemBuilder: (context, index) {
         final student = dataList[index];
         return InfoContainer(
-          name: student['name'] ?? '이름 없음',
+          name: student['name'] ?? '',
           major: student['major'] ?? '-',
-          task: student['task'] ?? '-',
+          grade: student['grade'] ?? 0,
+          applicationField: student['applicationField'] ?? '-',
           techStack: student['techStack'] ?? [],
-          info: student['info'] ?? '정보 없음',
-          isPublic: student['isPublic'] ?? true,
+          simpleInfo: student['simpleInfo'] ?? '',
           onTap: () {
-            Navigator.pushNamed(context, '/infopage');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${student['name']} 클릭됨')),
-            );
+            Navigator.pushNamed(context, '/infopage', arguments: student);
           },
         );
       },

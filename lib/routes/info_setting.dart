@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../model/user_profile.dart';
 import '../api/user_api.dart';
+import 'package:team_mate/model/user_profile.dart';
 
 class InfoSetting extends StatefulWidget {
   const InfoSetting({super.key});

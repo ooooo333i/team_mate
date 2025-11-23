@@ -1,33 +1,37 @@
+// lib/api/user_api.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../model/user_profile.dart';
-import '../services/token_storage.dart';
+import 'package:team_mate/services/token_storage.dart';
+import 'package:team_mate/model/user_profile.dart';
 
 class UserApi {
+  static const String baseUrl = "http://136.114.213.101:8080/api/v1";
+
+  // 회원 등록 (프로필 저장) - 토큰 필요(임시 토큰 또는 access token)
   static Future<bool> saveProfile(UserProfile profile) async {
     try {
-      final url = Uri.parse("http://136.114.213.101:8080/api/v1/member");
+      // 우선 accessToken, 없으면 temporaryToken 사용
+      String? token = await TokenStorage.getAccessToken();
+      token ??= await TokenStorage.getTemporaryToken();
 
-      // 토큰 가져오기 (임시 또는 액세스 토큰)
-      final accessToken = await TokenStorage.getTemporaryToken() ?? 
-                          await TokenStorage.getAccessToken();
-
-      if (accessToken == null) {
-        print("토큰 없음 → 로그인 필요");
+      if (token == null) {
+        // 토큰이 없으면 false
         return false;
       }
 
+      final authHeader = token.startsWith("Bearer ") ? token : "Bearer $token";
+
       final response = await http.post(
-        url,
+        Uri.parse("$baseUrl/member"),
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $accessToken", // 토큰 추가
+          "Authorization": authHeader,
         },
         body: jsonEncode(profile.toJson()),
       );
 
       print("회원 등록 응답 코드: ${response.statusCode}");
-      print("회원 등록 응답 본문: ${response.body}");
+      print("회원 등록 응답: ${response.body}");
 
       return response.statusCode == 200;
     } catch (e) {

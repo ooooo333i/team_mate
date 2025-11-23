@@ -9,76 +9,88 @@ class UserDrawer extends StatefulWidget {
 }
 
 class _UserDrawerState extends State<UserDrawer> {
-  String studentId = '';
-  String email = '';
-  String major = '';
+  Map<String, dynamic>? profile;
 
   @override
   void initState() {
     super.initState();
-    loadUserInfo();
+    loadProfile();
   }
 
-  Future<void> loadUserInfo() async {
-    // 저장된 정보 불러오기
-    //final storedId = await TokenStorage.getStudentId(); // 새로 추가 필요
-    //final storedEmail = await TokenStorage.getEmail();   // 새로 추가 필요
-    //final storedMajor = await TokenStorage.getMajor();   // 새로 추가 필요
-
+  Future<void> loadProfile() async {
+    final data = await TokenStorage.getUserProfile();
     if (!mounted) return;
-/*
+
     setState(() {
-      studentId = storedId ?? '';
-      email = storedEmail ?? '';
-      major = storedMajor ?? '';
+      profile = data;
     });
-    */
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = profile;
+
     return Drawer(
       width: 280,
       child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.person, size: 40),
-              title: const Text("로그인 정보"),
-              subtitle: Text("User ID: $studentId"),
-            ),
-            const Divider(),
+        child: user == null
+            ? const Center(child: Text("로그인이 필요합니다."))
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.person, size: 40),
+                    title: Text(user["name"] ?? "이름 없음"),
+                    subtitle: Text("학번: ${user["studentId"]}"),
+                  ),
+                  const Divider(),
 
-            ListTile(
-              leading: const Icon(Icons.mail),
-              title: const Text("Email"),
-              subtitle: Text(email.isNotEmpty ? email : '-'),
-            ),
+                  ListTile(
+                    leading: const Icon(Icons.school),
+                    title: const Text("전공"),
+                    subtitle: Text(user["major"] ?? "-"),
+                  ),
 
-            ListTile(
-              leading: const Icon(Icons.school),
-              title: const Text("전공"),
-              subtitle: Text(major.isNotEmpty ? major : '-'),
-            ),
+                  ListTile(
+                    leading: const Icon(Icons.grade),
+                    title: const Text("학년"),
+                    subtitle: Text("${user["grade"] ?? "-"}"),
+                  ),
 
-            const Spacer(),
+                  ListTile(
+                    leading: const Icon(Icons.build_circle),
+                    title: const Text("기술 스택"),
+                    subtitle: Text(
+                      (user["techStack"] as List<dynamic>?)
+                              ?.take(3)
+                              .join(", ") ??
+                          "-",
+                    ),
+                  ),
 
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                ),
-                onPressed: () {
-                  Navigator.pop(context); // Drawer 닫기
-                  Navigator.pushNamed(context, '/infosetting');
-                },
-                child: const Text("내 정보 수정하기"),
+                  ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: const Text("한 줄 소개"),
+                    subtitle: Text(user["simpleInfo"] ?? "-"),
+                  ),
+
+                  const Spacer(),
+
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/infosetting');
+                      },
+                      child: const Text("내 정보 수정하기"),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -25,12 +25,14 @@ class _HomeState extends State<Home> {
       key: scaffoldKey, // 🔑 드로어 열기 위해 필요
       appBar: AppBar(
         title: const Text('Team Mate'),
+        /*
         leading: IconButton(
           onPressed: () {
             Navigator.pushNamed(context, '/loginpage');
           },
           icon: const Icon(Icons.account_box),
         ),
+        */
         actions: [
           IconButton(
             onPressed: () {

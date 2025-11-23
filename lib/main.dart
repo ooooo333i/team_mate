@@ -5,6 +5,7 @@ import 'package:team_mate/routes/info_setting.dart';
 import 'package:team_mate/routes/login_page.dart';
 import 'package:team_mate/services/token_storage.dart';
 import 'theme/app_theme.dart';
+import 'routes/splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,10 +22,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      home: const SplashPage(),
       debugShowCheckedModeBanner: false,
       initialRoute: initialRoute,
       routes: {
-        '/' : (context) => const Home(),
+        '/home' : (context) => const Home(),
         '/loginpage': (context) => const LoginPage(),
         '/infosetting': (context) => const InfoSetting(),
         '/infopage': (context) => const InfoPage(),

@@ -21,14 +21,23 @@ class _FilterBlockState extends State<FilterBlock> {
     "전체",
     "컴퓨터공학과",
     "소프트웨어학과",
-    "정보보안학과",
-    "AI학과",
-    "데이터사이언스학과",
+    
+    "AI로봇학과",
+    
   ];
 
   final techList = [
-    "Flutter", "React", "Java", "Spring",
-    "Python", "Django", "C++", "Figma",
+    "C",
+    "PYTHON",
+    "JAVA",
+    "REACT",
+    "FLUTTER",
+    "ANDROID",
+    "SPRING",
+    "NODE.JS",
+    "AI",
+    "UNITY",
+    "UNREAL"
   ];
 
   void updateFilter() {

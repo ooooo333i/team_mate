@@ -101,6 +101,9 @@ class _UserDrawerState extends State<UserDrawer> {
               title: const Text("한 줄 소개"),
               subtitle: Text(user["simpleInfo"] ?? "-"),
             ),
+            ListTile(
+              
+            )
           ],
 
           const Spacer(),

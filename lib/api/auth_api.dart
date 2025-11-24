@@ -1,10 +1,10 @@
 // lib/api/auth_api.dart
 import 'dart:convert';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:team_mate/services/token_storage.dart';
 
 class AuthApi {
-  // 서버 주소로 바꿔줘 (끝에 /api/v1 까지 포함)
   static const String baseUrl = "http://136.114.213.101:8080/api/v1";
 
   /// 로그인: 서버 응답(body)을 파싱해서 Map으로 반환.
@@ -26,7 +26,7 @@ class AuthApi {
 
     // 만약 header에 "Bearer ..."가 아닌 토큰만 담겨있으면 나중에 처리하도록 그대로 둠.
     // (저장 시에는 그대로 저장하고, 요청 보낼 때 앞에 Bearer 붙여서 보냄.)
-
+    
     dynamic body;
     try {
       body = jsonDecode(response.body);
@@ -40,6 +40,7 @@ class AuthApi {
       "body": body, // 파싱된 body (Map 또는 String)
     };
   }
+  
 
   /// /member (내 프로필) 정보 가져오기
   /// - TokenStorage.getAccessToken()에서 꺼낸 값을 사용
@@ -66,7 +67,7 @@ class AuthApi {
       decoded = jsonDecode(response.body);
     } catch (e) {
       // body가 JSON이 아니면 로그 찍고 null 반환
-      print("AuthApi.getMemberProfile: JSON 디코드 실패 -> ${response.body}");
+      debugPrint("AuthApi.getMemberProfile: JSON 디코드 실패 -> ${response.body}");
       return null;
     }
 

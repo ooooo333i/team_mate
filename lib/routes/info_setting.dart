@@ -24,17 +24,17 @@ class _InfoSettingState extends State<InfoSetting> {
   String? selectedApplicationField;
 
   final List<String> allTechStacks = [
-    "FLUTTER",
-    "JAVA",
-    "SPRING",
-    "PYTHON",
     "C",
-    "AI", 
-    "REACT"
+    "PYTHON",
+    "JAVA",
+    "REACT",
+    "FLUTTER",
     "ANDROID",
-    "NODEJS",
+    "SPRING",
+    "NODE.JS",
+    "AI",
     "UNITY",
-    "UNREAL",
+    "UNREAL"
   ];
   List<String> selectedTechStacks = [];
 
@@ -45,8 +45,8 @@ class _InfoSettingState extends State<InfoSetting> {
         return "CS";
       case "소프트웨어학과":
         return "SW";
-      case "AI학과":
-        return "AI";
+      case "AI로봇학과":
+        return "AIR";
       default:
         return "";
     }
@@ -99,7 +99,7 @@ class _InfoSettingState extends State<InfoSetting> {
                   border: OutlineInputBorder(),
                 ),
                 items:
-                    ["컴퓨터공학과", "소프트웨어학과", "정보보안학과", "AI학과"]
+                    ["컴퓨터공학과", "소프트웨어학과", "AI로봇학과"]
                         .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                         .toList(),
                 onChanged: (v) => setState(() => selectedMajor = v),
@@ -155,7 +155,7 @@ class _InfoSettingState extends State<InfoSetting> {
                   border: OutlineInputBorder(),
                 ),
                 items:
-                    ["PM", "Frontend", "Backend", "VR", "Design"]
+                    ["PM", "Frontend", "Backend", "VR", "Design", "AI"]
                         .map((f) => DropdownMenuItem(value: f, child: Text(f)))
                         .toList(),
                 onChanged: (v) => setState(() => selectedApplicationField = v),
@@ -202,14 +202,14 @@ class _InfoSettingState extends State<InfoSetting> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final storage = const FlutterSecureStorage();
-                      final studentIdString = await storage.read(
+                      final studentId = await storage.read(
                         key: "studentId",
                       );
                       final jwt = await storage.read(key: "jwt");
 
                       // ⬇️ JSON 출력은 JWT 유무와 상관없이 먼저 수행
                       final profile = UserProfile(
-                        studentId: int.tryParse(studentIdString ?? "0") ?? 0,
+                        studentId: int.tryParse(studentId ?? "0") ?? 0,
                         name: nameController.text.trim(),
                         major: mapMajor(selectedMajor),
                         grade: int.parse(gradeController.text.trim()),
@@ -231,7 +231,7 @@ class _InfoSettingState extends State<InfoSetting> {
 
                       
                       // ⬇️ JWT 체크는 이 뒤에서
-                      if (studentIdString == null || jwt == null) {
+                      if (studentId == null || jwt == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text("JWT가 없습니다. 로그인 후 다시 시도하세요."),

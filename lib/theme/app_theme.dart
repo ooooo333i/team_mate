@@ -26,17 +26,6 @@ class AppTheme {
         ),
       ),
     ),
-
-    // ✅ 카드 기본 스타일
-    cardTheme: const CardThemeData(
-      color: Colors.white,
-      elevation: 4,
-      shadowColor: Colors.black26,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    ),
   );
 
   // 🌙 다크 테마

@@ -22,7 +22,7 @@ class CustomBottomNavBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.favorite),
-          label: 'Lieked',
+          label: 'Liked',
         ),
       ],
     );

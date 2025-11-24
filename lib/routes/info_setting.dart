@@ -12,7 +12,7 @@ class InfoSetting extends StatefulWidget {
 
 class _InfoSettingState extends State<InfoSetting> {
   final _formKey = GlobalKey<FormState>();
-
+final TextEditingController stdIdController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController gradeController = TextEditingController();
   final TextEditingController contactController = TextEditingController();
@@ -209,7 +209,7 @@ class _InfoSettingState extends State<InfoSetting> {
 
                       // ⬇️ JSON 출력은 JWT 유무와 상관없이 먼저 수행
                       final profile = UserProfile(
-                        studentId: int.tryParse(studentId ?? "0") ?? 0,
+                        studentId: 21011776,
                         name: nameController.text.trim(),
                         major: mapMajor(selectedMajor),
                         grade: int.parse(gradeController.text.trim()),

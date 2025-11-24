@@ -26,15 +26,16 @@ class AuthApi {
 
     // 만약 header에 "Bearer ..."가 아닌 토큰만 담겨있으면 나중에 처리하도록 그대로 둠.
     // (저장 시에는 그대로 저장하고, 요청 보낼 때 앞에 Bearer 붙여서 보냄.)
-    
+    TokenStorage.setAccessToken(  rawAuth ?? "");
     dynamic body;
     try {
       body = jsonDecode(response.body);
     } catch (e) {
       body = response.body;
     }
-
+    print("🔐 저장된 토큰 확인: ${await TokenStorage.getAccessToken()}");
     return {
+      
       "statusCode": response.statusCode,
       "tokenHeader": rawAuth, // header에 있는 인증 헤더 (null 가능)
       "body": body, // 파싱된 body (Map 또는 String)

@@ -12,7 +12,7 @@ void main() async {
 
   final token = await TokenStorage.getAccessToken();
 
-  runApp(MyApp(initialRoute: token == null ? '/loginpage' : '/'));
+  runApp(MyApp(initialRoute: token == null ? '/home' : '/'));
 }
 
 class MyApp extends StatelessWidget {

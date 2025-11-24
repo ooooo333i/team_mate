@@ -13,7 +13,7 @@ class UserApi {
       // 우선 accessToken, 없으면 temporaryToken 사용
       String? token = await TokenStorage.getAccessToken();
       token ??= await TokenStorage.getTemporaryToken();
-
+      print("사용할 토큰: $token");
       if (token == null) {
         // 토큰이 없으면 false
         return false;
@@ -21,7 +21,7 @@ class UserApi {
 
       final authHeader = token.startsWith("Bearer ") ? token : "Bearer $token";
 
-      final response = await http.post(
+      final response = await http.patch(
         Uri.parse("$baseUrl/member"),
         headers: {
           "Content-Type": "application/json",

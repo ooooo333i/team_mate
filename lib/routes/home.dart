@@ -3,6 +3,8 @@ import 'package:team_mate/components/profiles_page.dart';
 import 'package:team_mate/components/liked_listview.dart';
 import 'package:team_mate/components/bottom_navi_bar.dart';
 import 'package:team_mate/components/user_drawer.dart';
+import 'package:team_mate/services/token_storage.dart';
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -13,26 +15,33 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int currentIndex = 0;
 
-  final pages = [
-    ProfilesPage(),     // 필터 + 리스트
-    LikedListview(),    // 좋아요 목록 화면
-  ];
+  // ✅ 변경: List<Widget> 명시 (StatefulWidget 아님)
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkToken();
+
+    // ✅ pages 초기화
+    pages = [
+      const ProfilesPage(), // ProfilesPage (StatefulWidget)
+      const LikedListview(), // LikedListview (StatefulWidget)
+    ];
+  }
+
+  Future<void> _checkToken() async {
+    final token = await TokenStorage.getAccessToken();
+    debugPrint("[Home.initState] 토큰: $token");
+  }
 
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
-      key: scaffoldKey, // 🔑 드로어 열기 위해 필요
+      key: scaffoldKey,
       appBar: AppBar(
         title: const Text('Team Mate'),
-        /*
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/loginpage');
-          },
-          icon: const Icon(Icons.account_box),
-        ),
-        */
         actions: [
           IconButton(
             onPressed: () {
@@ -41,7 +50,6 @@ class _HomeState extends State<Home> {
             icon: const Icon(Icons.info),
           ),
         ],
-      
       ),
       endDrawer: const UserDrawer(),
       body: IndexedStack(

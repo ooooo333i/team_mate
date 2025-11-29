@@ -201,15 +201,9 @@ final TextEditingController stdIdController = TextEditingController();
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      final storage = const FlutterSecureStorage();
-                      final studentId = await storage.read(
-                        key: "studentId",
-                      );
-                      final jwt = await storage.read(key: "jwt");
-
-                      // ⬇️ JSON 출력은 JWT 유무와 상관없이 먼저 수행
+                      // ✅ 변경: studentId를 입력값에서 가져오기
                       final profile = UserProfile(
-                        studentId: 21011776,
+                        studentId: int.tryParse(stdIdController.text) ?? 0,
                         name: nameController.text.trim(),
                         major: mapMajor(selectedMajor),
                         grade: int.parse(gradeController.text.trim()),
@@ -223,35 +217,22 @@ final TextEditingController stdIdController = TextEditingController();
                         visibility: true,
                       );
 
-                      debugPrint("===== 저장 버튼 클릭됨 =====");
-                      debugPrint("보낼 요청 바디:");
+                      debugPrint("===== 프로필 저장 =====");
                       debugPrint(profile.toJson().toString());
-                      debugPrint("================================");
-
-
-                      
-                      // ⬇️ JWT 체크는 이 뒤에서
-                      if (studentId == null || jwt == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("JWT가 없습니다. 로그인 후 다시 시도하세요."),
-                          ),
-                        );
-                        
-                      }
 
                       // 실제 저장 API 호출
-                      final ok = await UserApi.saveProfile(profile);
+                      final ok = await UserApi.initProfile(profile); // ✅ initProfile 사용
 
                       if (ok) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(const SnackBar(content: Text("저장 완료!")));
-                        Navigator.pushReplacementNamed(context, "/");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("저장 완료!")),
+                        );
+                        // ✅ 변경: pushReplacementNamed → pushNamedAndRemoveUntil
+                        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
                       } else {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(const SnackBar(content: Text("저장 실패")));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("저장 실패")),
+                        );
                       }
                     }
                   },

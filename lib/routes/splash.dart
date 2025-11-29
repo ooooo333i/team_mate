@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:team_mate/theme/color_schemes.dart';
 import 'package:team_mate/services/token_storage.dart';
-import 'package:team_mate/routes/home.dart';
-import 'package:team_mate/routes/login_page.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -26,27 +24,22 @@ class _SplashPageState extends State<SplashPage> {
     final token = await TokenStorage.getAccessToken();
     if (!mounted) return;
 
+    // ✅ 변경: MaterialPageRoute → pushNamedAndRemoveUntil (스택 정리)
     if (token != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Home()),
-      );
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
+      Navigator.pushNamedAndRemoveUntil(context, '/loginpage', (route) => false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: lightColorScheme.secondary, // 테마 색
+      backgroundColor: lightColorScheme.secondary,
       body: Center(
         child: Text(
-          'Team Mate', // 가운데 제목
-          style: const TextStyle(
+          'Team Mate',
+          style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
             color: Colors.white,

@@ -168,17 +168,22 @@ class _InfoListViewState extends State<InfoListView> {
       itemCount: displayList.length,
       itemBuilder: (context, index) {
         final student = displayList[index];
-        
-        // ✅ UI에 표시할 때는 한글명으로 변환
         final majorDisplay = majorCodeToName[student['major']] ?? student['major'] ?? '-';
 
         return InfoContainer(
           name: student['name'] ?? '',
-          major: majorDisplay, // 한글명으로 표시
+          major: majorDisplay,
           grade: student['grade'] ?? 0,
           applicationField: student['applicationField'] ?? '-',
           techStack: student['techStack'] ?? [],
           simpleInfo: student['simpleInfo'] ?? '',
+          isLiked: false, // ✅ 추가: 서버에서 받아올 값
+          onLikeChanged: (isLiked) {
+            // ✅ 좋아요 상태 변경 시 서버에 요청
+            debugPrint('[listview] 좋아요 변경: ${student['name']} - $isLiked');
+            // TODO: API 호출 예정
+            // await LikeApi.toggleLike(student['studentId'], isLiked);
+          },
           onTap: () {
             Navigator.pushNamed(context, '/infopage', arguments: student);
           },

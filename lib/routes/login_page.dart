@@ -46,29 +46,26 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("등록되지 않은 사용자입니다")),
         );
-        Navigator.pushReplacementNamed(context, '/infosetting');
+        // ✅ 변경: pushReplacementNamed → pushNamed (뒤로가기 허용)
+        Navigator.pushNamed(context, '/infosetting');
         return;
       }
 
       // 로그인 성공
       if (statusCode == 200 && headerAuth != null) {
-        // ✅ 토큰 저장
         await TokenStorage.setAccessToken(headerAuth);
-
-        // ✅ 프로필 조회 및 저장
         final profile = await UserApi.getMyProfile();
         if (profile != null) {
           await TokenStorage.setUserProfile(profile.toJson());
           debugPrint("프로필 저장 완료: ${profile.name}");
-        } else {
-          debugPrint("프로필 조회 실패");
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("로그인 성공")),
         );
 
-        Navigator.pushReplacementNamed(context, '/');
+        // ✅ 변경: pushReplacementNamed (Home으로 이동 + 스택 정리)
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
         return;
       }
 

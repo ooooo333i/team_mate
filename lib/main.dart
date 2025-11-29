@@ -3,35 +3,31 @@ import 'package:team_mate/routes/home.dart';
 import 'package:team_mate/routes/info_page.dart';
 import 'package:team_mate/routes/info_setting.dart';
 import 'package:team_mate/routes/login_page.dart';
+import 'package:team_mate/routes/splash.dart';
 import 'package:team_mate/services/token_storage.dart';
 import 'theme/app_theme.dart';
-import 'routes/splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final token = await TokenStorage.getAccessToken();
-
-  runApp(MyApp(initialRoute: token == null ? '/home' : '/'));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final String initialRoute;
-  const MyApp({super.key, required this.initialRoute});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const SplashPage(),
-
       debugShowCheckedModeBanner: false,
-      initialRoute: initialRoute,
+      initialRoute: '/splash', // ✅ SplashPage부터 시작
       routes: {
-        '/home' : (context) => const Home(),
+        '/splash': (context) => const SplashPage(),
+        '/': (context) => const Home(), // ✅ routes에만 정의
         '/loginpage': (context) => const LoginPage(),
         '/infosetting': (context) => const InfoSetting(),
         '/infopage': (context) => const InfoPage(),
       },
+      // ❌ 제거: home 속성 제거 (routes의 '/'와 충돌)
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
